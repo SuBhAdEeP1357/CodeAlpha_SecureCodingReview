@@ -2,9 +2,9 @@
 
 A Python-based **secure coding review and remediation project** developed for the **CodeAlpha Cyber Security Internship, Task 3**.
 
-The project demonstrates an end-to-end security review workflow using a deliberately vulnerable local Python application, manual source inspection, Bandit static analysis, documented findings, secure remediation, and automated regression testing.
+This project demonstrates an end-to-end secure-coding workflow using a deliberately vulnerable local Python application, manual source inspection, **Bandit static analysis**, documented security findings, a separate secure reference implementation, and automated regression testing.
 
-> **Educational use only:** The vulnerable application is intentionally insecure and is provided solely as a controlled local audit target. Do not deploy it to production or expose it to untrusted users.
+> **Educational and authorized use only:** The vulnerable application is intentionally insecure and exists solely as a controlled local audit target. Do not deploy it to production or expose it to untrusted users or networks.
 
 ---
 
@@ -22,6 +22,7 @@ The project demonstrates an end-to-end security review workflow using a delibera
 - [Security Findings](#security-findings)
 - [Secure Version](#secure-version)
 - [Verification and Testing](#verification-and-testing)
+- [Evidence Screenshots](#evidence-screenshots)
 - [Reports](#reports)
 - [CodeAlpha Task 3 Mapping](#codealpha-task-3-mapping)
 - [Security and Ethical Use](#security-and-ethical-use)
@@ -33,43 +34,41 @@ The project demonstrates an end-to-end security review workflow using a delibera
 
 ## Project Overview
 
-The purpose of this project is to demonstrate a practical **secure-coding review lifecycle**.
+The project follows a practical **before-and-after secure-coding review model**.
 
-A deliberately vulnerable Python application is reviewed to identify insecure implementation patterns. The identified issues are then documented, assigned a review risk level, remediated in a separate secure reference implementation, and verified with static analysis and regression tests.
-
-The project intentionally maintains two implementations:
+A deliberately vulnerable Python application is inspected to identify insecure implementation patterns. The identified issues are assessed, documented, and remediated in a separate secure reference implementation. Both the vulnerable and remediated versions are then verified with static analysis and automated tests.
 
 ```text
 target_app/vulnerable_app.py
-        |
-        | Security review
-        v
-Security findings
-        |
-        | Remediation
-        v
+            |
+            | Manual review + Bandit
+            v
+      Security findings
+            |
+            | Remediation
+            v
 secure_version/secure_app.py
-        |
-        | Verification
-        v
-Bandit re-scan + pytest
+            |
+            | Verification
+            v
+      Bandit re-scan + pytest
 ```
 
-This separation provides a clear before-and-after comparison without modifying the original audit target.
+Keeping the two implementations separate preserves the vulnerable code as a reproducible audit artifact while making the remediated coding practices easy to compare.
 
 ---
 
 ## Objective
 
-The project objectives are to:
+The main objectives are to:
 
 1. Review a controlled Python application for common secure-coding weaknesses.
-2. Use both **manual source inspection** and **Bandit static analysis**.
-3. Document findings with evidence, impact, risk, and recommendations.
-4. Implement secure alternatives in a separate reference implementation.
-5. Re-scan the secure implementation.
-6. Verify important security controls through automated regression tests.
-7. Preserve the review evidence in a form that can be reproduced by another reviewer.
+2. Combine **manual source inspection** with **Bandit static analysis**.
+3. Document security findings with evidence, impact, risk, recommendations, and remediation.
+4. Implement safer alternatives in a dedicated secure reference implementation.
+5. Re-scan the remediated implementation.
+6. Validate important controls through automated regression tests.
+7. Preserve the complete review evidence for reproducibility.
 
 ---
 
@@ -93,7 +92,7 @@ Controlled Vulnerable Application
          Secure Remediation
                 |
                 v
-        Bandit Re-scan
+          Bandit Re-scan
                 |
                 v
        Security Regression Tests
@@ -103,15 +102,15 @@ Controlled Vulnerable Application
 
 ## Key Security Areas
 
-The review covers the following security-sensitive areas:
+The review focuses on:
 
 - Application secrets and configuration
-- Password hashing and storage
+- Password hashing and credential storage
 - SQL query construction
 - Operating-system command execution
 - File and path handling
-- Serialized data handling
-- Authentication logging
+- Unsafe deserialization
+- Sensitive authentication logging
 - Security regression testing
 
 ---
@@ -155,23 +154,25 @@ CodeAlpha_SecureCodingReview/
 └── requirements.txt
 ```
 
-Generated local files such as Python cache directories, pytest cache, SQLite databases, log files, and virtual environments are excluded through `.gitignore`.
+Generated local artifacts such as `__pycache__/`, `.pytest_cache/`, virtual environments, SQLite databases, and log files are excluded by `.gitignore`.
 
 ---
 
 ## Requirements
 
-- Python 3.10 or newer
-- `pytest`
-- `bandit`
+- Python 3.10+
+- pytest 9.1.1
+- Bandit 1.9.4
 
-The verified development environment used for the current review was:
+The verified environment used for the final review was:
 
 ```text
 Python:  3.13.15
 pytest:  9.1.1
 Bandit:  1.9.4
 ```
+
+Dependencies are pinned in `requirements.txt`.
 
 ---
 
@@ -190,29 +191,44 @@ python -m pytest --version
 python -m bandit --version
 ```
 
+Expected versions:
+
+```text
+pytest 9.1.1
+bandit 1.9.4
+```
+
 ---
 
 ## Running the Project
 
-### 1. Run the vulnerable target
+### Run the vulnerable target
 
-The vulnerable application is intended only for controlled local review:
+The vulnerable target is intended only for controlled local review:
 
 ```powershell
 python target_app\vulnerable_app.py
 ```
 
-It initializes the demonstration database and identifies itself as the intentionally vulnerable target.
+It initializes the local demonstration database and identifies itself as the intentionally vulnerable target.
 
-Do not expose this application to untrusted users.
+> **Warning:** Never deploy the vulnerable target as a production application or expose it to untrusted users.
 
-### 2. Run the security regression tests
+### Run the review helper
+
+The repository includes a helper script that runs the Bandit baseline scan and writes the machine-readable report:
+
+```powershell
+python tools\run_review.py
+```
+
+### Run the regression tests
 
 ```powershell
 python -m pytest -q
 ```
 
-The current verified regression-test result is:
+Verified result:
 
 ```text
 8 passed
@@ -222,7 +238,7 @@ The current verified regression-test result is:
 
 ## Baseline Security Scan
 
-The baseline scan is performed against the intentionally vulnerable target.
+The baseline scan is performed against the deliberately vulnerable target.
 
 ### Run Bandit
 
@@ -230,55 +246,62 @@ The baseline scan is performed against the intentionally vulnerable target.
 python -m bandit -r target_app
 ```
 
-### Generate the JSON report
+### Generate the machine-readable report
 
 ```powershell
 python -m bandit -r target_app -f json -o reports\bandit_report.json
 ```
 
-The generated report is stored at:
+The report is stored at:
 
 ```text
 reports/bandit_report.json
 ```
 
-### Run the review helper
+### Verified baseline
 
-The project also includes an automated helper:
+The final verified Bandit 1.9.4 scan reported:
 
-```powershell
-python tools\run_review.py
+```text
+Lines of code scanned: 187
+
+High:   1
+Medium: 3
+Low:    3
+Total:  7
+
+Errors: 0
+Files skipped: 0
 ```
 
-It executes Bandit against `target_app/`, writes the JSON report, and prints a concise summary.
+### Baseline findings
 
-### Recorded baseline
+| Bandit ID | Description | Severity | Confidence |
+|---|---|---|---|
+| B403 | `pickle` module import advisory | Low | High |
+| B404 | `subprocess` module import advisory | Low | High |
+| B105 | Possible hard-coded secret/password | Low | Medium |
+| B608 | Possible SQL injection in `create_user()` | Medium | Low |
+| B608 | Possible SQL injection in `find_user()` | Medium | Low |
+| B602 | `subprocess` call with `shell=True` | High | High |
+| B301 | Unsafe `pickle.load()` deserialization | Medium | High |
 
-The verified Bandit 1.9.4 scan covered **187 lines of code** and reported **7 findings**:
+### Interpreting B403 and B404
 
-| Bandit severity | Count |
-|---|---:|
-| High | 1 |
-| Medium | 3 |
-| Low | 3 |
-| **Total** | **7** |
+B403 and B404 are **module-level advisories**. Their presence alone does not prove that a vulnerability is exploitable.
 
-The baseline scan completed without scanner errors or skipped files.
+The actionable issues are:
 
-### Important interpretation
+- unsafe `pickle.load()` usage, documented as **SC-007**
+- `subprocess` execution with `shell=True`, documented as **SC-005**
 
-Two of the seven Bandit results are module-level advisories:
-
-- **B403** for importing `pickle`
-- **B404** for importing `subprocess`
-
-These are retained as scanner evidence but are not treated as standalone exploitable vulnerabilities. The actionable weaknesses are the unsafe `pickle.load()` usage and the `subprocess` call using `shell=True`.
+They are therefore preserved as scanner evidence rather than counted as separate standalone vulnerabilities in the final manual finding register.
 
 ---
 
 ## Security Findings
 
-The combined manual review and static analysis produced **eight actionable findings**:
+The combined Bandit and manual review identified **8 actionable security findings**:
 
 | ID | Finding | Evidence | Review Risk |
 |---|---|---|---|
@@ -291,7 +314,7 @@ The combined manual review and static analysis produced **eight actionable findi
 | SC-007 | Unsafe deserialization with `pickle` | B301 + B403 + manual review | High |
 | SC-008 | Plaintext password logging | Manual review | High |
 
-Detailed descriptions, evidence, impacts, recommendations, and remediation references are available in:
+For full evidence, impact analysis, recommendations, and remediation references, see:
 
 [`reports/FINDINGS.md`](reports/FINDINGS.md)
 
@@ -305,27 +328,28 @@ The remediated reference implementation is:
 secure_version/secure_app.py
 ```
 
-The secure version demonstrates the following controls:
+It demonstrates:
 
 - Environment-based application secret loading
-- Salted PBKDF2-HMAC password hashing
-- Constant-time password verification
+- Salted PBKDF2-HMAC-SHA256 password hashing
+- Stored iteration count for password verification
+- Constant-time password comparison with `hmac.compare_digest()`
 - Parameterized SQLite queries
 - Explicit command allowlisting
 - `shell=False` for subprocess execution
 - Command execution timeout
 - Resolved-path containment validation
 - JSON instead of `pickle`
-- Credential-safe authentication logging
+- Credential-safe logging
 - Input validation for security-sensitive operations
 
-The secure version is intentionally kept separate from the vulnerable target so that the review remains easy to reproduce.
+The secure implementation is intentionally kept separate from the vulnerable target to preserve a clear before-and-after comparison.
 
 ---
 
 ## Verification and Testing
 
-### Secure-version static analysis
+### Secure-version Bandit scan
 
 Run:
 
@@ -336,16 +360,24 @@ python -m bandit -r secure_version
 Verified result:
 
 ```text
+Lines of code scanned: 257
+
 High:   0
 Medium: 0
 Low:    2
+Files skipped: 0
 ```
 
-The original High- and Medium-severity Bandit findings are no longer present in the secure implementation.
+The remaining Low findings are:
 
-The remaining Low findings are related to controlled `subprocess` usage. The secure implementation uses a fixed command allowlist and `shell=False`, so the original `B602` `shell=True` pattern is not present.
+```text
+B404  subprocess import advisory
+B603  subprocess usage with shell=False
+```
 
-The remaining advisory is documented rather than hidden or suppressed.
+The original High-severity `B602` finding caused by `shell=True` is no longer present.
+
+The secure implementation also uses a fixed command allowlist and a timeout. The remaining Low advisories are documented rather than hidden or suppressed.
 
 ### Security regression tests
 
@@ -363,15 +395,14 @@ Verified result:
 
 The regression suite covers:
 
-- Salted password hashing
-- Password verification
-- Different salts for repeated password hashing
+- Password hashing and verification
+- Random salting
 - Parameterized database operations
 - JSON serialization and deserialization
 - Path traversal rejection
 - Command allowlisting
-- Safe execution of an allowlisted command
-- JSON output validity
+- Allowlisted command execution
+- Valid JSON output
 
 ---
 
@@ -385,57 +416,82 @@ The regression suite covers:
 | Low Bandit findings | 3 | 2 |
 | Regression tests | N/A | 8 passed |
 
-The results demonstrate a reduction in the most significant static-analysis findings after remediation.
+The most significant Bandit findings were removed by the secure implementation. The remaining Low findings are documented subprocess advisories associated with the controlled use of `subprocess` and `shell=False`.
+
+---
+
+## Evidence Screenshots
+
+The repository includes five screenshots documenting the major stages of the review:
+
+### 1. Final Project Structure
+
+![Final project structure](screenshots/01_project_structure.png)
+
+### 2. Bandit Baseline Scan
+
+![Bandit baseline scan](screenshots/02_bandit_baseline.png)
+
+### 3. Security Findings
+
+![Security findings](screenshots/03_security_findings.png)
+
+### 4. Secure Remediation
+
+![Secure remediation](screenshots/04_secure_remediation.png)
+
+### 5. Final Verification
+
+![Final verification](screenshots/05_tests_passed.png)
+
+See [`screenshots/README.md`](screenshots/README.md) for the evidence index and descriptions.
 
 ---
 
 ## Reports
 
-The project includes three human-readable reports:
+The project includes the following reports:
 
 - [`reports/SECURITY_REVIEW.md`](reports/SECURITY_REVIEW.md)  
-  Review scope, methodology, baseline, risk interpretation, remediation overview, and verification.
+  Review scope, methodology, baseline analysis, risk interpretation, remediation overview, and verification.
 
 - [`reports/FINDINGS.md`](reports/FINDINGS.md)  
-  Detailed finding register, evidence, impact, recommendations, and remediation references.
+  Detailed security finding register, evidence, impact, recommendations, and remediation references.
 
 - [`reports/REMEDIATION.md`](reports/REMEDIATION.md)  
-  Remediation matrix, secure-coding practices, implementation changes, and verification results.
+  Remediation matrix, secure-coding controls, implementation changes, verification, and reproducibility.
 
-The machine-readable Bandit evidence is stored in:
-
-```text
-reports/bandit_report.json
-```
+- [`reports/bandit_report.json`](reports/bandit_report.json)  
+  Machine-readable Bandit baseline evidence generated from the vulnerable target.
 
 ---
 
 ## CodeAlpha Task 3 Mapping
 
-CodeAlpha Task 3 requires a security review of a selected application, use of static analysis or manual inspection, secure-coding recommendations, and documented remediation.
-
-| CodeAlpha Task 3 requirement | Project implementation |
+| CodeAlpha Task 3 activity | Project implementation |
 |---|---|
-| Select a language and application | Python controlled target application |
+| Select a programming language | Python |
+| Select an application to audit | `target_app/vulnerable_app.py` |
 | Perform a security review | Manual source inspection |
-| Use static analysis or manual inspection | Bandit 1.9.4 + manual review |
-| Identify security vulnerabilities | Eight-item security finding register |
-| Provide secure-coding recommendations | Finding-level recommendations |
+| Use static analysis | Bandit 1.9.4 |
+| Identify vulnerabilities | Eight-item security finding register |
+| Provide recommendations | Finding-level secure-coding recommendations |
 | Implement remediation | `secure_version/secure_app.py` |
 | Verify remediation | Bandit re-scan + pytest |
 | Document findings and remediation | `reports/` documentation |
+| Provide supporting evidence | `screenshots/` evidence package |
 
 ---
 
 ## Security and Ethical Use
 
-This project is an educational secure-coding exercise.
+This repository is an educational secure-coding exercise.
 
-The intentionally vulnerable application exists only to demonstrate security review and remediation techniques. It must not be used as a production application.
+The intentionally vulnerable application exists only to demonstrate the security-review and remediation process. It must not be deployed as-is.
 
 Only assess systems, applications, networks, or data that you own or have explicit authorization to test.
 
-Do not use the vulnerable target to access, alter, or interfere with systems belonging to other users.
+Do not use the vulnerable target to access, modify, or interfere with systems belonging to other users.
 
 ---
 
@@ -450,14 +506,15 @@ Security findings documented        ✅
 Secure remediation                  ✅
 Secure-version Bandit re-scan       ✅
 Security regression tests           ✅ 8 passed
-Project documentation               ✅
-Final evidence screenshots          ✅
-GitHub submission                   ✅
-CodeAlpha submission form           ✅
-LinkedIn project video              ✅
+Evidence screenshots                ✅ 5 files
+GitHub repository upload            ✅
+CodeAlpha submission form           ⏳
+LinkedIn project video              ⏳
 ```
 
-The **technical Task 3 implementation and verification are complete**. The remaining items are submission and presentation evidence.
+**Technical implementation, security review, remediation, verification, evidence collection, and GitHub upload are complete.**
+
+The remaining items are the external CodeAlpha submission form and LinkedIn project video.
 
 ---
 
