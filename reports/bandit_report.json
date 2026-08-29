@@ -1,0 +1,195 @@
+{
+  "errors": [],
+  "generated_at": "2026-08-29T16:44:16Z",
+  "metrics": {
+    "_totals": {
+      "CONFIDENCE.HIGH": 4,
+      "CONFIDENCE.LOW": 2,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 1,
+      "SEVERITY.LOW": 3,
+      "SEVERITY.MEDIUM": 3,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 187,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "target_app\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 11,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "target_app\\vulnerable_app.py": {
+      "CONFIDENCE.HIGH": 4,
+      "CONFIDENCE.LOW": 2,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 1,
+      "SEVERITY.LOW": 3,
+      "SEVERITY.MEDIUM": 3,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 176,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": [
+    {
+      "code": "25 import os\n26 import pickle\n27 import sqlite3\n",
+      "col_offset": 0,
+      "end_col_offset": 13,
+      "filename": "target_app\\vulnerable_app.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 502,
+        "link": "https://cwe.mitre.org/data/definitions/502.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with pickle module.",
+      "line_number": 26,
+      "line_range": [
+        26
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b403-import-pickle",
+      "test_id": "B403",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "27 import sqlite3\n28 import subprocess\n29 from pathlib import Path\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": "target_app\\vulnerable_app.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 28,
+      "line_range": [
+        28
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "39 # This exists so the security review can identify the secret-management issue.\n40 APP_SECRET = \"CodeAlpha-Demo-Secret-2026\"\n41 \n",
+      "col_offset": 13,
+      "end_col_offset": 41,
+      "filename": "target_app\\vulnerable_app.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'CodeAlpha-Demo-Secret-2026'",
+      "line_number": 40,
+      "line_range": [
+        40
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "99         query = (\n100             \"INSERT INTO users (username, password_hash) \"\n101             f\"VALUES ('{username}', '{password_hash}')\"\n102         )\n",
+      "col_offset": 12,
+      "end_col_offset": 23,
+      "filename": "target_app\\vulnerable_app.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 100,
+      "line_range": [
+        100,
+        101
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "130         query = (\n131             \"SELECT id, username, password_hash \"\n132             f\"FROM users WHERE username = '{username}'\"\n133         )\n",
+      "col_offset": 12,
+      "end_col_offset": 43,
+      "filename": "target_app\\vulnerable_app.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 131,
+      "line_range": [
+        131,
+        132
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "158         command,\n159         shell=True,\n160         capture_output=True,\n161         text=True,\n162         check=False,\n163     )\n164 \n165     return result.stdout\n166 \n",
+      "col_offset": 13,
+      "end_col_offset": 5,
+      "filename": "target_app\\vulnerable_app.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "HIGH",
+      "issue_text": "subprocess call with shell=True identified, security issue.",
+      "line_number": 159,
+      "line_range": [
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html",
+      "test_id": "B602",
+      "test_name": "subprocess_popen_with_shell_equals_true"
+    },
+    {
+      "code": "211     ) as file:\n212         return pickle.load(file)\n213 \n",
+      "col_offset": 15,
+      "end_col_offset": 32,
+      "filename": "target_app\\vulnerable_app.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 502,
+        "link": "https://cwe.mitre.org/data/definitions/502.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Pickle and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue.",
+      "line_number": 212,
+      "line_range": [
+        212
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b301-pickle",
+      "test_id": "B301",
+      "test_name": "blacklist"
+    }
+  ]
+}
